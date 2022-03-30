@@ -6,6 +6,7 @@
 対応形式：obj，off
 
 <p align="center">
+  <img src="image/meshViewer3.png" width="800">
   <img src="image/meshViewer2.png" width="800">
   <img src="image/meshViewer.png" width="800">
   <br>
