@@ -5,4 +5,6 @@
 
 対応形式：obj，off
 
+<img src="image/meshViewer.png" width="600">
+
 注意：ファイルパスに日本語が含まれているとちゃんと表示できません．
