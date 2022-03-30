@@ -5,6 +5,15 @@
 
 対応形式：obj，off
 
-<img src="image/meshViewer2.png" width="800"> <img src="image/meshViewer.png" width="800">面を選択したとき
+<p align="center">
+  <img src="image/meshViewer2.png" width="800">
+  <img src="image/meshViewer.png" width="800">
+  <br>
+  <em>面を選択すると赤く強調されます．（上が選択前，下が選択後）</em>
+</p>
 
+<p>
 注意：ファイルパスに日本語が含まれているとちゃんと表示できません．
+  
+　　：現在も開発中
+</p>
