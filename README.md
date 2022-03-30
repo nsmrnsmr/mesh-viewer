@@ -7,6 +7,8 @@
 
 <p align="center">
   <img src="image/meshViewer3.png" width="800">
+  <br>
+  <em>立ち上げたときの画面です．</em>
   <img src="image/meshViewer2.png" width="800">
   <img src="image/meshViewer.png" width="800">
   <br>
