@@ -10,6 +10,8 @@
   <br>
   <em>mesh viewerを立ち上げたときの画面</em>
   <img src="image/meshViewer2.png" width="800">
+  <br>
+  <em>mesh viewerを立ち上げたときの画面</em>
   <img src="image/meshViewer.png" width="800">
   <br>
   <em>面を選択すると赤く強調されます．（上が選択前，下が選択後）</em>
