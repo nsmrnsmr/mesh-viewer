@@ -5,6 +5,8 @@
 
 対応形式：obj，off
 
+Qt Creatorを利用して開発しています．
+
 <p align="center">
   <img src="image/meshViewer3.png" width="800">
   <br>
