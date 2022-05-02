@@ -20,7 +20,7 @@ Qt Creatorを利用して開発しています．
 </p>
 
 利用ライブラリ：Qt  
-参考文献　　　：[OpenGL + Qt Tutorial](ghorwin.github.io/openglwithqt-tutorial)
+参考文献　　　：[OpenGL + Qt Tutorial](https://github.com/ghorwin/OpenGLWithQt-Tutorial)
 
 <p>注意：ファイルパスに日本語が含まれているとちゃんと表示できません．</p>
 　　：現在も開発中
