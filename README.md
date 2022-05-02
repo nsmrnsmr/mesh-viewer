@@ -5,7 +5,7 @@
 
 対応形式：obj，off
 
-Qt Creatorを利用して開発しています．
+QtCreatorを利用して開発しています．現在は，QtCreatorを利用しての実行に対応しています．
 
 <p align="center">
   <img src="image/meshViewer3.png" width="800">
