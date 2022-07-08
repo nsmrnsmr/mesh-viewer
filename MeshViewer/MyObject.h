@@ -16,7 +16,7 @@ class MyObject
 {
 public:
     MyObject() :
-        counter(0),
+        meshCounter(0),
         m_vbo(QOpenGLBuffer::VertexBuffer),
         m_ebo(QOpenGLBuffer::IndexBuffer)
       {};//初めに読み込むモデルがない場合何もしない
@@ -44,16 +44,23 @@ public:
 
     //自分追加する部分inport mesh
     std::vector<MyMesh> m_meshes;
-    int counter;
+    unsigned int meshCounter;
 
     //The function is called during OpenGL initialization, where the OpenGL context is current.
+    //オブジェクトごとにdataを用意してみる　やめてみた
     std::vector<Vertex> m_vertexBufferData;
     std::vector<GLuint> m_elementBufferData;
+//    std::vector<std::vector<Vertex> > m_vertexBufferDatas;
+//    std::vector<std::vector<GLuint> > m_elementBufferDatas;
 
     //Wraps an OpenGL VertexArrayObject, that references the vertex coordinates and color buffers.
+    //vaoを読み込んだオブジェクトごとに変更してみる。だめだった
     QOpenGLVertexArrayObject m_vao;
     QOpenGLBuffer m_vbo;
     QOpenGLBuffer m_ebo;
+//    std::vector<QOpenGLVertexArrayObject> m_vaos;
+//    std::vector<QOpenGLBuffer> m_vbos;
+//    std::vector<QOpenGLBuffer> m_ebos;
 };
 
 #endif // MYOBJECT_H

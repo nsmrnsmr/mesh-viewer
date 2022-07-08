@@ -11,7 +11,7 @@ TestDialog::TestDialog() :
 #ifdef Q_OS_WIN
     QDialog(nullptr, Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint)
 #else
-    QDialog(nullptr, Qt::window)
+    QDialog(nullptr, Qt::Window)
 #endif
 {
     QSurfaceFormat format;

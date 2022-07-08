@@ -4,5 +4,9 @@
         <file>Shaders/grid.vert</file>
         <file>Shaders/sample.frag</file>
         <file>Shaders/sample.vert</file>
+        <file>Shaders/ssao.frag</file>
+        <file>Shaders/ssao.vert</file>
+        <file>Shaders/Phong.frag</file>
+        <file>Shaders/Lambert.frag</file>
     </qresource>
 </RCC>

@@ -6,7 +6,7 @@
 #include <QDebug>
 void GridObject::create(QOpenGLShaderProgram *shaderProgram)
 {
-    const unsigned int N = 1000;
+    const unsigned int N = 3000;
     float width = 5000;
 
     std::vector<float> gridVertexBufferData;

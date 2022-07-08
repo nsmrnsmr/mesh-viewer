@@ -130,10 +130,11 @@ bool KeyboardMouseHandler::releaseButton(Qt::MouseButton btn, QPoint currentPos)
     return true;
 }
 
+//マウスの感度調節ができるように変更する(変数追加する)
 QPoint KeyboardMouseHandler::resetMouseDelta(const QPoint currentPos){
     QPoint dist = currentPos - m_mouseDownPos;
     m_mouseDownPos = currentPos;
-    return dist;
+    return dist*0.4;
 }
 
 int KeyboardMouseHandler::wheelDelta() const{

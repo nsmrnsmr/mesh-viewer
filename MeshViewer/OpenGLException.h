@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <list>
+#include <ostream>
 
 #include <QString>
 

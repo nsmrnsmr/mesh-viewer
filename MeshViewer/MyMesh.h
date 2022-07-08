@@ -10,6 +10,7 @@
 #include "Transform3d.h"
 #include "Vertex.h"
 #include "Face.h"
+#include "Halfedge.h"
 
 //メッシュの読み込み：obj形式 off形式
 //メッシュの読み込みに自分のライブラリを利用する "input.h"
@@ -29,6 +30,10 @@ public:
         m_colors = c;
     }
 
+    Face getFace(int idx){
+        return m_faces[idx];
+    }
+
     void transform(const QMatrix4x4 &transform);
 
     unsigned int getFaceSize(){
@@ -39,12 +44,28 @@ public:
         return FaceSize;
     }
 
+    unsigned int getVertexSize(){
+        return VertexCount;
+    }
+
+    unsigned int getVertexSize() const{
+        return VertexCount;
+    }
+
+    unsigned int getIndexSize(){
+        return IndexCount;
+    }
+
+    unsigned int getIndexSize() const{
+        return IndexCount;
+    }
+
     void copy2Buffer(Vertex *&vertexBuffer, GLuint *&elementBuffer, unsigned int &elementStartIndex) const;
 
-    unsigned int VertexCount;
+    unsigned int VertexCount; //面数×３（描画するときに面ごとに頂点を指定しないといけないため）
     unsigned int IndexCount;
     unsigned int FaceSize;
-    unsigned int scale = 10;
+    unsigned int scale = 20;//モデルのスケールを保存する変数
 
     /*! Tests if line in space, defined through starting point p1 and distance/direction d intersects the plane
             with index planeIdx.
@@ -63,6 +84,9 @@ private:
 
     std::vector<QVector3D> m_vertices;
     std::vector<Face> m_faces;
+    std::vector<Halfedge> m_halfedges;
+    std::vector<int> m_vertexToHalfedge;
+    std::vector<QVector3D> m_vertexNormals;
     std::vector<Triangle> m_planeInfo; //populated in copy2Buffer
     std::vector<QColor> m_colors; //size l = uniform color, size FaceSize = face colors
 };

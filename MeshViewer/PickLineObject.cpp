@@ -28,6 +28,9 @@ void PickLineObject::create(QOpenGLShaderProgram *shaderProgram)
     //index 1 = position
     shaderProgram->enableAttributeArray(1);
     shaderProgram->setAttributeBuffer(1, GL_FLOAT, offsetof(Vertex, r), 3, sizeof (Vertex));
+    //index 2 = vertex normal
+    shaderProgram->enableAttributeArray(2);
+    shaderProgram->setAttributeBuffer(2, GL_FLOAT, offsetof(Vertex, nx), 3, sizeof(Vertex));
 
     m_vao.release();
     m_vbo.release();

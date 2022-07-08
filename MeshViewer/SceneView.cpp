@@ -24,11 +24,25 @@ SceneView::SceneView() :
     m_keyboardMouseHandler.addRecongnizedKey(Qt::Key_Shift);
 
     //***create scene (no OpenGL calls are being issued, just the date structures are creared.)
-
+#if SSAO
+    //Shaderprogram #0 : ssao geometry
+    ShaderProgram ssao(":/Shaders/ssao.vert",":/Shaders/ssao.frag");
+    ssao.m_uniformNames.append("worldToView");
+    ssao.m_uniformNames.append("unit");
+    ssao.m_uniformNames.append("point");
+    ssao.m_uniformNames.append("reflection");
+    ssao.m_uniformNames.append("refraction");
+    ssao.m_uniformNames.append("bgdistance");
+    m_shaderPrograms.append(ssao);
+#else
     //Shaderprogram #0 : regular geometry (painting triangules via element index)
     ShaderProgram blocks(":/Shaders/sample.vert",":/Shaders/sample.frag");
     blocks.m_uniformNames.append("worldToView");
+    blocks.m_uniformNames.append("lightColor");
+    blocks.m_uniformNames.append("lightDirection");
+    blocks.m_uniformNames.append("viewToWorld");
     m_shaderPrograms.append(blocks);
+#endif
 
     //Shaderprogram #1 : grid (painting grid lines)
     ShaderProgram grid(":/Shaders/grid.vert",":/Shaders/grid.frag");
@@ -45,6 +59,10 @@ SceneView::SceneView() :
     m_camera.rotate(-30, m_camera.right());
     //look slightly right
     m_camera.rotate(-25, QVector3D(0.0f, 1.0f, 0.0f));
+    //lighting
+    m_lightColor = QVector3D(1,1,1);
+    m_lightDirection = QVector3D(-50, 100, 150);
+    m_lightDirection = QVector3D(0,0,1);
 }
 
 SceneView::~SceneView()
@@ -87,6 +105,9 @@ void SceneView::initializeGL()
         // enable depth testing, important for the grid and for the drawing order of several objects
         glEnable(GL_DEPTH_TEST);
 
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+
         //initialize drawable objects
         //m_boxObjct.create(SHADER(0));
         if(m_object.size() != 0) m_object.create(SHADER(0));
@@ -123,6 +144,7 @@ void SceneView::paintGL()
     qDebug() << "SceneView::paintGL()";
     //process input, i.e. check if any keys have been pressed
     if(m_inputEventReceived){
+        qDebug() << "input event";
         processInput();
     }
 
@@ -156,14 +178,24 @@ void SceneView::paintGL()
     }
     SHADER(0)->release();
     */
-
     //*** render import objects ***
     qDebug() << "my_object size :" <<m_object.size();
     if(m_object.size() != 0){
         m_gpuTimers.recordSample();//setup meshes
         SHADER(0)->bind();
+#if SSAO
+        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[0], m_worldToView); //worldToView
+        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[1], m_worldToView); //unit
+        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[2], m_worldToView); //point
+        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[3], m_worldToView); //reflection
+        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[4], m_worldToView); //refraction
+        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[5], m_worldToView); //bgdistance
+#else
         SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[0], m_worldToView);
-
+        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[1], m_lightColor);
+        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[2], m_lightDirection);
+        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[3], m_worldToView.inverted());
+#endif
         m_gpuTimers.recordSample(); //render meshes
         m_object.render();
 
@@ -397,7 +429,7 @@ void SceneView::selectNearestObject(const QVector3D &nearPoint, const QVector3D 
     PickObject p(2.f, std::numeric_limits<unsigned int>::max());
 
     //now process all objects and update p to hold the closest hit
-    m_boxObjct.pick(nearPoint, d, p);
+    //m_boxObjct.pick(nearPoint, d, p);
     m_object.pick(nearPoint, d, p);
     // ...other objects
 
@@ -409,7 +441,7 @@ void SceneView::selectNearestObject(const QVector3D &nearPoint, const QVector3D 
     qDebug().nospace() << "Pick successful (Box #" << p.m_objectId << ", Face #" << p.m_faceId << ", t = " << p.m_dist << ") after" << pickTimer.elapsed() << " ms";
 
     //Mind: OpenGL-context must be current when we call this function!
-    m_boxObjct.highlight(p.m_objectId, p.m_faceId);
+    //m_boxObjct.highlight(p.m_objectId, p.m_faceId);
     m_object.highlight(p.m_objectId, p.m_faceId);
 }
 
