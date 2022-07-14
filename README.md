@@ -14,7 +14,7 @@ QtCreatorを利用して開発しています．現在は，QtCreatorを利用�
 development branch に開発中のものを上げています。
 
 <p align="center">
-  <img src="image/meshViewer3.png" width="800">
+  <img src="image/LambertNew.PNG" width="800">
   <br>
   <em>mesh viewerを立ち上げたときの画面</em>
   <br>
