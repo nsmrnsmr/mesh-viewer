@@ -20,6 +20,7 @@
 
 QtCreatorを利用して開発しています．現在は，QtCreatorを利用しての実行に対応しています．  
 
+---
 <p align="center">
   <img src="image/LambertNew.PNG" width="800">
   <br>
