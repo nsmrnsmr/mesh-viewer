@@ -21,6 +21,7 @@ void ShaderProgram::create()
     Q_ASSERT(m_program == nullptr);
 
     //build and compile our shader program
+    qDebug() << "ShaderProgram::create()";
 
     m_program = new QOpenGLShaderProgram();
 
@@ -49,6 +50,7 @@ void ShaderProgram::create()
 
 void ShaderProgram::destroy()
 {
+    qDebug() << "ShaderProgram::destroy()";
     delete m_program;
     m_program = nullptr;
 }

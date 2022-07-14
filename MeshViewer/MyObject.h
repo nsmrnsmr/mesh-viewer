@@ -29,9 +29,7 @@ public:
 
     void render();
 
-    size_t size(){
-        return m_meshes.size();
-    }
+    size_t size(){ return m_meshes.size(); }
 
     /*! Thread-save pick function.
             Checks if any of the box object surfaces is hit by the ray defined by "p1 + d [0..1]" and

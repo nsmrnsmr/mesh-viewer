@@ -56,6 +56,8 @@ void MyObject::create(QOpenGLShaderProgram *shaderProgram)
     //create each buffers if already created buffers
     if( !m_vao.isCreated() ){
         //create and bind Vertex Buffer Object
+        //qDebug() << "MyObject::create()::m_vao";
+        //destroy();
         m_vao.create();
     }
     m_vao.bind();
@@ -102,6 +104,7 @@ void MyObject::create(QOpenGLShaderProgram *shaderProgram)
 //    m_vbos.push_back(m_vbo);
 //    m_ebos.push_back(m_ebo);
     meshCounter++;
+    qDebug() << "m_vao size: " <<sizeof(m_vao);
 }
 
 void MyObject::destroy()

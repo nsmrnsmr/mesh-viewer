@@ -58,5 +58,5 @@ void PickLineObject::setPoints(const QVector3D &a, const QVector3D &b)
     m_vbo.bind();
     m_vbo.allocate(m_vertexBufferData.data(), vertexMemSize);
     m_vbo.release();
-    m_visible = true;
+    //m_visible = true;
 }

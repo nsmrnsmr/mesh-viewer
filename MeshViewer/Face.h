@@ -8,17 +8,11 @@ struct Face{
         v2(c)
     {};
 
-    int x(){
-        return v0;
-    }
+    int x(){ return v0; }
 
-    int y(){
-        return v1;
-    }
+    int y(){ return v1; }
 
-    int z(){
-        return v2;
-    }
+    int z(){ return v2; }
 
     void push_back(const int &a){
         if(v0 < 0) v0 = a;

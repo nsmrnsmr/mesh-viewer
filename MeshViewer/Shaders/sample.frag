@@ -17,12 +17,12 @@ void main(){
     finalColor = fragColor;
 #else
     //lambert reflection
-    //vec3 lambert = (vec3(dot(normal, normalize(lightDirection)))*.5 + .5) * lightColor;
-    //vec4 frag = fragColor * vec4(lambert, 1.0);
-    //finalColor = frag;
+    vec3 lambert = (vec3(dot(normal, normalize(lightDirection)))*.5 + .5) * lightColor;
+    vec4 frag = fragColor * vec4(lambert, 1.0);
+    finalColor = frag;
 
     //Gouraud Sharding　たぶんvertex shaderで実装するのがいい
-    float gouraudParameter = clamp(dot(normal, normalize(lightDirection)), 0.0, 1.0);
+    /*float gouraudParameter = clamp(dot(normal, normalize(lightDirection)), 0.0, 1.0);
     gouraudParameter = gouraudParameter * 0.5 + 0.5;
     finalColor = vec4(clamp(gouraudParameter * fragColor, 0.0, 1.0));
 
@@ -61,7 +61,7 @@ void main(){
     }
 
     finalColor.xyz = ambient + diffuse  + specular;
-    finalColor.w = 1.0;
+    finalColor.w = 1.0;*/
 
 #endif
 }

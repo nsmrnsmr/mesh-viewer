@@ -28,14 +28,15 @@ void main(){
     //vec3 lambert = vec3(dot(normalize(vertexNormal), lightDirection)) * lightColor * color;
     //fragColor = vec4(lambert, 1.0);
 
-    vec3 n = normalize(mat3(worldToView) * vertexNormal);
+    //vec3 n = normalize(mat3(worldToView) * vertexNormal);
 
-    //vec3 n = vertexNormal;
+    vec3 n = vertexNormal;
     float gouraudParameter = clamp(dot(n, normalize(lightDirection)), 0.0, 1.0);
-    //gouraudParameter = gouraudParameter * 0.5 + 0.5;
+    gouraudParameter = gouraudParameter * 0.5 + 0.5;
     fragColor = vec4(clamp(gouraudParameter * diffuseMaterial, 0.0, 1.0), 1.0);
 #else
     normalVec = normalize(vertexNormal);
+    //normalVec = vertexNormal;
     fragColor = vec4(color, 1.0);
 
 

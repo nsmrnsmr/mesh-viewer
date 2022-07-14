@@ -4,14 +4,19 @@
 #include <QOpenGLShaderProgram>
 #include <QDateTime>
 #include <QDebug>
+#include <QFileInfo>
 
 #include "DebugApplication.h"
 #include "PickObject.h"
 
+//#define N 0
 #define SHADER(x) m_shaderPrograms[x].shaderProgram()
+#define GSHADER(x) m_gridShaderPrograms[x].shaderProgram()
 
 SceneView::SceneView() :
-    m_inputEventReceived(false)
+    m_inputEventReceived(false),
+    m_shaderId(0),
+    m_gridShaderId(0)
 {
     qDebug() << "ScenecView::SceneView()";
     //tell keyboard handler to monitor certain keys
@@ -24,32 +29,40 @@ SceneView::SceneView() :
     m_keyboardMouseHandler.addRecongnizedKey(Qt::Key_Shift);
 
     //***create scene (no OpenGL calls are being issued, just the date structures are creared.)
-#if SSAO
-    //Shaderprogram #0 : ssao geometry
-    ShaderProgram ssao(":/Shaders/ssao.vert",":/Shaders/ssao.frag");
-    ssao.m_uniformNames.append("worldToView");
-    ssao.m_uniformNames.append("unit");
-    ssao.m_uniformNames.append("point");
-    ssao.m_uniformNames.append("reflection");
-    ssao.m_uniformNames.append("refraction");
-    ssao.m_uniformNames.append("bgdistance");
-    m_shaderPrograms.append(ssao);
-#else
+
     //Shaderprogram #0 : regular geometry (painting triangules via element index)
+    //shaderの名前をそのうち変更する Lambert
     ShaderProgram blocks(":/Shaders/sample.vert",":/Shaders/sample.frag");
     blocks.m_uniformNames.append("worldToView");
     blocks.m_uniformNames.append("lightColor");
     blocks.m_uniformNames.append("lightDirection");
     blocks.m_uniformNames.append("viewToWorld");
     m_shaderPrograms.append(blocks);
-#endif
 
-    //Shaderprogram #1 : grid (painting grid lines)
+    //Shaderprogram #1 : regular geometry Phong Shading(painting triangules via element index)
+    ShaderProgram Phong(":/Shaders/sample.vert",":/Shaders/Phong.frag");
+    Phong.m_uniformNames.append("worldToView");
+    Phong.m_uniformNames.append("lightColor");
+    Phong.m_uniformNames.append("lightDirection");
+    Phong.m_uniformNames.append("viewToWorld");
+    m_shaderPrograms.append(Phong);
+
+    //GridShaderprogram #0 : grid (painting grid lines)
     ShaderProgram grid(":/Shaders/grid.vert",":/Shaders/grid.frag");
     grid.m_uniformNames.append("worldToView");
     grid.m_uniformNames.append("gridColor");
     grid.m_uniformNames.append("backColor");
-    m_shaderPrograms.append(grid);
+    m_gridShaderPrograms.append(grid);
+
+    //***Initialize fragment shader file name list
+    for(const ShaderProgram &s : m_shaderPrograms){
+        QFileInfo fileInfo = QFileInfo(s.m_fragmentShaderFilePath);
+        m_shaderList.append(fileInfo.baseName());
+    }
+    for(const ShaderProgram &s : m_gridShaderPrograms){
+        QFileInfo fileInfo = QFileInfo(s.m_fragmentShaderFilePath);
+        m_gridShaderList.append(fileInfo.baseName());
+    }
 
     //***Initialize camera placement and model placement in the world
 
@@ -61,7 +74,7 @@ SceneView::SceneView() :
     m_camera.rotate(-25, QVector3D(0.0f, 1.0f, 0.0f));
     //lighting
     m_lightColor = QVector3D(1,1,1);
-    m_lightDirection = QVector3D(-50, 100, 150);
+    //m_lightDirection = QVector3D(-50, 100, 150);
     m_lightDirection = QVector3D(0,0,1);
 }
 
@@ -71,6 +84,10 @@ SceneView::~SceneView()
         m_context->makeCurrent(this);
 
         for(ShaderProgram &p : m_shaderPrograms){
+            p.destroy();
+        }
+
+        for(ShaderProgram &p : m_gridShaderPrograms){
             p.destroy();
         }
 
@@ -84,8 +101,39 @@ SceneView::~SceneView()
 }
 
 void SceneView::inputMyObject(const QString &fileName, const QString &suffix){
+    qDebug() << "SceneView::inputMyObject()";
     m_object.readMesh(fileName, suffix);
-    m_object.create(SHADER(0));
+    m_object.create(SHADER(m_shaderId)); //指定したシェーダでcreateするようにする
+    renderLater();
+    return;
+}
+
+void SceneView::inputFragmentShader(const QString &fileName, const QString &suffix, const QString &name)
+{
+    qDebug() << "SceneView::inputFragmentShader()";
+    if(suffix == "frag"){
+        ShaderProgram newShader(":/Shaders/sample.vert",fileName);
+        newShader.m_uniformNames.append("worldToView");
+        newShader.m_uniformNames.append("lightColor");
+        newShader.m_uniformNames.append("lightDirection");
+        newShader.m_uniformNames.append("viewToWorld");
+        m_shaderPrograms.append(newShader);
+    }
+    m_shaderList.append(name);
+    //update useing fragment shader id
+    m_shaderId = m_shaderPrograms.size() - 1;
+    //new shader compile
+    m_shaderPrograms[m_shaderId].create();
+    //attach m_object data to new shader
+    if(m_object.size() != 0) m_object.create(SHADER(m_shaderId));
+    renderLater();
+    return;
+}
+
+void SceneView::changeFragmentShader(const int shaderId)
+{
+    m_shaderId = shaderId;
+    if(m_object.size() != 0) m_object.create(SHADER(m_shaderId));
     renderLater();
     return;
 }
@@ -96,7 +144,12 @@ void SceneView::initializeGL()
     qDebug() << "SceneView::initializeGL()";
     try{
         //Initialize shader programs
+        //指定したシェーダのみコンパイルするようにする。
+        //デフォルトは、3つのシェーダを入れておく
         for(ShaderProgram &p : m_shaderPrograms){
+            p.create();
+        }
+        for(ShaderProgram &p : m_gridShaderPrograms){
             p.create();
         }
 
@@ -110,9 +163,9 @@ void SceneView::initializeGL()
 
         //initialize drawable objects
         //m_boxObjct.create(SHADER(0));
-        if(m_object.size() != 0) m_object.create(SHADER(0));
-        m_gridObject.create(SHADER(1));
-        m_pickLineObject.create(SHADER(0));
+        if(m_object.size() != 0) m_object.create(SHADER(m_shaderId));
+        m_gridObject.create(GSHADER(m_gridShaderId));
+        m_pickLineObject.create(SHADER(m_shaderId));
 
         //Timer
         m_gpuTimers.setSampleCount(5);
@@ -178,24 +231,18 @@ void SceneView::paintGL()
     }
     SHADER(0)->release();
     */
+
     //*** render import objects ***
     qDebug() << "my_object size :" <<m_object.size();
     if(m_object.size() != 0){
         m_gpuTimers.recordSample();//setup meshes
-        SHADER(0)->bind();
-#if SSAO
-        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[0], m_worldToView); //worldToView
-        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[1], m_worldToView); //unit
-        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[2], m_worldToView); //point
-        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[3], m_worldToView); //reflection
-        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[4], m_worldToView); //refraction
-        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[5], m_worldToView); //bgdistance
-#else
-        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[0], m_worldToView);
-        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[1], m_lightColor);
-        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[2], m_lightDirection);
-        SHADER(0)->setUniformValue(m_shaderPrograms[0].m_uniformIDs[3], m_worldToView.inverted());
-#endif
+        SHADER(m_shaderId)->bind();
+
+        SHADER(m_shaderId)->setUniformValue(m_shaderPrograms[m_shaderId].m_uniformIDs[0], m_worldToView);
+        SHADER(m_shaderId)->setUniformValue(m_shaderPrograms[m_shaderId].m_uniformIDs[1], m_lightColor);
+        SHADER(m_shaderId)->setUniformValue(m_shaderPrograms[m_shaderId].m_uniformIDs[2], m_lightDirection);
+        SHADER(m_shaderId)->setUniformValue(m_shaderPrograms[m_shaderId].m_uniformIDs[3], m_worldToView.inverted());
+
         m_gpuTimers.recordSample(); //render meshes
         m_object.render();
 
@@ -203,20 +250,20 @@ void SceneView::paintGL()
             //m_gpuTimers.recordSample(); //render pickline
             m_pickLineObject.render();
         }
-        SHADER(0)->release();
+        SHADER(m_shaderId)->release();
     }
 
     //*** render grid afterwards ***
 
     m_gpuTimers.recordSample(); //setup grid
-    SHADER(1)->bind();
-    SHADER(1)->setUniformValue(m_shaderPrograms[1].m_uniformIDs[0], m_worldToView);
-    SHADER(1)->setUniformValue(m_shaderPrograms[1].m_uniformIDs[1], gridColor);
-    SHADER(1)->setUniformValue(m_shaderPrograms[1].m_uniformIDs[2], backColor);
+    GSHADER(m_gridShaderId)->bind();
+    GSHADER(m_gridShaderId)->setUniformValue(m_gridShaderPrograms[m_gridShaderId].m_uniformIDs[0], m_worldToView);
+    GSHADER(m_gridShaderId)->setUniformValue(m_gridShaderPrograms[m_gridShaderId].m_uniformIDs[1], gridColor);
+    GSHADER(m_gridShaderId)->setUniformValue(m_gridShaderPrograms[m_gridShaderId].m_uniformIDs[2], backColor);
 
     m_gpuTimers.recordSample(); //render grid
     m_gridObject.render();
-    SHADER(1)->release();
+    GSHADER(m_gridShaderId)->release();
 
     m_gpuTimers.recordSample(); //done painting
 

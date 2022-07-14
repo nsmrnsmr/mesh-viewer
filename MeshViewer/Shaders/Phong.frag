@@ -34,16 +34,20 @@ void main(void)
 
     // 環境光の計算
     vec3 ambient = Ka*La;    // gl_FrontLightProduct[0].ambentで置き換え可能
-
+vec3 normal = normalize(normalVec);
     // 拡散反射の計算
     float diffuseLight = max(dot(lightDirection, normalVec), 0.0);
+    diffuseLight = max(dot(normalize(lightDirection), normal), 0.0);
     vec3 diffuse = Kd * Ld * diffuseLight;
 
     //鏡面反射の計算
     vec3 specular = vec3(0.0);
     if(diffuseLight > 0.0){
         vec3 R = 2.0 * normalVec * dot(lightDirection, normalVec) - lightDirection;
+
+        R = 2.0 * normal * dot(normalize(lightDirection), normal) - normalize(lightDirection);
         float specularLight = pow(max(dot(R, normalVec), 0.0), shine);
+        specularLight = pow(max(dot(R, normal), 0.0), shine);
         specular = Ks * Ls * specularLight;
     }
 

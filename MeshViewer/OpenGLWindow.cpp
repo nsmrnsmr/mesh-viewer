@@ -25,8 +25,8 @@ void OpenGLWindow::renderLater()
 void OpenGLWindow::renderNow()
 {
     if(!isExposed()) return;
-    // initialize on first call
 
+    // initialize on first call
     if(m_context == nullptr) initOpenGL();
 
     m_context->makeCurrent(this);

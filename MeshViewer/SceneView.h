@@ -7,6 +7,7 @@
 #include <QMatrix4x4>
 #include <QOpenGLTimeMonitor>
 #include <QElapsedTimer>
+#include <QStringList>
 
 #include "OpenGLwindow.h"
 #include "ShaderProgram.h"
@@ -24,6 +25,9 @@ public:
     virtual ~SceneView() override;
 
     void inputMyObject(const QString &fileName, const QString &suffix);
+    void inputFragmentShader(const QString &fileName, const QString &suffix, const QString &name);
+    void changeFragmentShader(const int shaderId);
+    QList<QString> getShaderList(){ return m_shaderList; }
 
 protected:
     void initializeGL() override;
@@ -76,6 +80,14 @@ private:
 #endif
     //All shader programs used in the scene.
     QList<ShaderProgram> m_shaderPrograms;
+    QList<ShaderProgram> m_gridShaderPrograms;
+    //useing m_shaderPrograms index to m_object
+    u_int m_shaderId;
+    u_int m_gridShaderId;
+
+    //TestDialogクラス内のQComboBoxに利用可能シェーダを表示させるためのリスト
+    QStringList m_shaderList;
+    QStringList m_gridShaderList;
 
     BoxObject m_boxObjct;
     GridObject m_gridObject;

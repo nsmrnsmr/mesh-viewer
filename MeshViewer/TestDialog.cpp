@@ -4,8 +4,10 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QDebug>
 
 #include "SceneView.h"
+#include "qcombobox.h"
 
 TestDialog::TestDialog() :
 #ifdef Q_OS_WIN
@@ -23,7 +25,7 @@ TestDialog::TestDialog() :
 #ifdef GL_DEBUG_
     format.setOption(QSurfaceFormat::DebugContext);
 #endif
-
+    qDebug() << "TestDialog::TestDialog()";
     m_sceneView = new SceneView;
     m_sceneView->setFormat(format);
 
@@ -57,8 +59,17 @@ TestDialog::TestDialog() :
     QPushButton * meshImportBtn = new QPushButton(tr("Open"), this);
     connect(meshImportBtn, &QPushButton::clicked, this, &TestDialog::open);
 
+    QPushButton * fragmentShaderImportBtn = new QPushButton(tr("newFragShader"), this);
+    connect(fragmentShaderImportBtn, &QPushButton::clicked, this, &TestDialog::openFragmentShader);
+
+    changeFragmentShaderCbx = new QComboBox(this);
+    changeFragmentShaderCbx->addItems(m_sceneView->getShaderList());
+    connect(changeFragmentShaderCbx, &QComboBox::currentTextChanged, this, &TestDialog::changeFragmentShader);
+
     hlay->addWidget(closeBtn);
     hlay->addWidget(meshImportBtn);
+    hlay->addWidget(fragmentShaderImportBtn);
+    hlay->addWidget(changeFragmentShaderCbx);
     hlay->setStretch(0,1);
 
     vlay->addLayout(hlay);
@@ -79,4 +90,26 @@ void TestDialog::open()
     //SceneViewにMyObjectを定義してファイル名と拡張子を渡す
     m_sceneView->inputMyObject(fileName, suffix);
     //if(!fileName.isEmpty()) scribbleArea->openImage(fileName);
+}
+
+void TestDialog::openFragmentShader()
+{
+    //今のところ.fragを対象とする.fsh用のはまだ実装しない
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::currentPath());
+    QFileInfo fileInfo = QFileInfo(fileName);
+    QString suffix = fileInfo.suffix();
+    QString name = fileInfo.baseName();
+
+    changeFragmentShaderCbx->addItem(fileInfo.baseName());
+    //changeFragmentShaderCbx->setView();
+    m_sceneView->inputFragmentShader(fileName, suffix, name);
+}
+
+void TestDialog::changeFragmentShader()
+{
+    int shaderId = changeFragmentShaderCbx->currentIndex();
+    qDebug() << "TestDialog::changeFragmentShader()" << shaderId;
+    //shaderリストの中から好きなシェーダを選べるようにする
+    //QList<QString> shaderList = m_sceneView->getShaderList();
+    m_sceneView->changeFragmentShader(shaderId);
 }

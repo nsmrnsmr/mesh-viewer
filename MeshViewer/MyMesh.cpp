@@ -33,7 +33,7 @@ MyMesh::MyMesh(const std::string &fileName, const std::string &suffix, QColor me
     for(int i=0; i<(int)FaceSize; ++i){
         Face f = m_faces[i];
         for(int j=0; j<3; ++j){
-            m_vertexToHalfedge[f[j]] = 3*i+((j+2)%3);
+            //m_vertexToHalfedge[f[j]] = 3*i+((j+2)%3);
             m_vertexToHalfedge[f[j]] = 3*i+j;
             int hId = 3*i + j;
             m_halfedges[hId].setId(hId);
@@ -80,6 +80,7 @@ void MyMesh::transform(const QMatrix4x4 &transform)
 
 void MyMesh::copy2Buffer(Vertex *&vertexBuffer, GLuint *&elementBuffer, unsigned int &elementStartIndex) const
 {
+    qDebug() << "MyMesh::copy2Buffer()";
     std::vector<QColor> cols;
     Q_ASSERT(!m_colors.empty());
     //three ways to store vertex colors
@@ -115,6 +116,7 @@ void MyMesh::copy2Buffer(Vertex *&vertexBuffer, GLuint *&elementBuffer, unsigned
 
     //halfedge data structureを組み込めたらコメントアウト外せる:完了
     //頂点法線を計算する
+    //メッシュの読み込みをしたとき以外で呼び出せないようにする (未)
     //例外処理を実装する（境界処理）
     //calc vertex normal if m_planeInfo is not empty.
     Q_ASSERT(!planeInfo.empty());
@@ -131,7 +133,7 @@ void MyMesh::copy2Buffer(Vertex *&vertexBuffer, GLuint *&elementBuffer, unsigned
             h = m_halfedges[h].preHalfedge();
             h = m_halfedges[h].oppHalfedge();
             //qDebug() << m_halfedges[h].srcVertex();
-            //Q_ASSERT(m_halfedges[h].srcVertex() == i);
+            Q_ASSERT(m_halfedges[h].srcVertex() == i);
         }while(h != h_end && h != -1);
 
         if(h == -1){
