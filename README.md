@@ -21,10 +21,6 @@ development branch に開発中のものを上げています。
   <img src="image/PhongNew.PNG" width="800">
   <br>
   <em>Phong shading</em>
-  <br>
-  <img src="image/meshViewer.png" width="800">
-  <br>
-  <em>面を選択すると赤く強調されます．</em>
 </p>
 
 利用ライブラリ：Qt  
