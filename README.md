@@ -16,11 +16,11 @@ development branch に開発中のものを上げています。
 <p align="center">
   <img src="image/LambertNew.PNG" width="800">
   <br>
-  <em>mesh viewerを立ち上げたときの画面</em>
+  <em>Lambert reflection</em>
   <br>
-  <img src="image/meshViewer2.png" width="800">
+  <img src="image/PhongNew.PNG" width="800">
   <br>
-  <em>任意の三角形メッシュを読み込めます．</em>
+  <em>Phong shading</em>
   <br>
   <img src="image/meshViewer.png" width="800">
   <br>
